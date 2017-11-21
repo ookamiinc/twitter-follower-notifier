@@ -31,11 +31,11 @@ class FollowerNotifier
         author_link: "https://twitter.com/#{name}",
         author_icon: url,
         fields: [
-          { title: 'Followers', value: count }
+          { title: 'Followers', value: count, short: true }
         ],
         color: COLORS[index]
       }
-      attachment[:fields] << { title: 'Target', value: count } if targets && targets[index]
+      attachment[:fields] << { title: 'Target', value: count, short: true } if targets && targets[index]
 
       attachment
     end
