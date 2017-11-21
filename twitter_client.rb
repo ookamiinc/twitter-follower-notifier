@@ -1,5 +1,6 @@
 require 'twitter'
 
+# Simple Wrapper for Twitter::REST::Client instance
 module Twitter
   class << self
     attr_writer :client

@@ -1,5 +1,7 @@
 require './twitter_client.rb'
 
+# Notify followers_count of twitter users
+# Specified by the screen_names
 class FollowerNotifier
   COLORS = %w[#7CD197 #3366FF #33CCFF #33FFCC #6633FF #003DF5 #B88A00 #66FF33 #CC33FF #002EB8 #F5B800 #FF33CC #FF3366 #FF6633 #FFCC33].freeze
 
