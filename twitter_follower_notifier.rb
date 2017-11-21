@@ -40,6 +40,10 @@ class FollowerNotifier
           title: 'Target',
           value: targets[index], short: true
         }
+        attachment[:fields] << {
+          title: (ENV['TWITTER_TARGET_DIFF_MESSAGE'] || 'Diff'),
+          value: (targets[index].to_i - count), short: true
+        }
       end
 
       attachment
