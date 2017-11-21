@@ -1,34 +1,51 @@
-require 'slack/incoming/webhooks'
-require 'twitter'
+require './twitter-client.rb'
 
-def post_follower_count(count)
-  attachments = [{
-    title: "フォロワー#{count}人ばい！",
-    color: '#7CD197'
-  }]
+class FollowerNotifier
+  COLORS = %w[#7CD197 #3366FF #33CCFF #33FFCC #6633FF #003DF5 #B88A00 #66FF33 #CC33FF #002EB8 #F5B800 #FF33CC #FF3366 #FF6633 #FFCC33].freeze
 
-  slack = Slack::Incoming::Webhooks.new(ENV['WEBHOOK_URL'])
-  slack.post(nil, attachments: attachments)
-end
+  def self.call
+    # Comma separated screen_name of Twitter
+    screen_names = ENV['TWITTER_SCREEN_NAMES'].split(',')
 
-def call
-  #
-  # See more about twitter gem
-  # https://github.com/sferik/twitter
-  #
-  client = Twitter::REST::Client.new do |config|
-    config.consumer_key        = ENV['TWITTER_CONSUMER_KEY']
-    config.consumer_secret     = ENV['TWITTER_CONSUMER_SECRET']
-    config.access_token        = ENV['TWITTER_ACCESS_TOKEN']
-    config.access_token_secret = ENV['TWITTER_ACCESS_TOKEN_SECRET']
+    attachments = []
+    screen_names.each_with_index do |name, index|
+      attachments << compose_attachement(name: name, index: index)
+    end
+
+    slack = Slack::Incoming::Webhooks.new(ENV['WEBHOOK_URL'])
+    slack.post(nil, attachments: attachments)
   end
-  #
-  # See more about #user
-  # http://www.rubydoc.info/gems/twitter/Twitter/REST/Users#user-instance_method
-  #
-  user = client.user(ENV['TWITTER_SCREEN_NAME'])
 
-  post_follower_count(user.followers_count)
+  class << self
+    private
+
+    def compose_attachement(name: 'Default Name', index: 0)
+      targets = ENV['TWITTER_FOLLOWER_TARGETS'].split(',')
+      url, count = profile(name)
+
+      attachment = {
+        author_name: name,
+        author_link: "https://twitter.com/#{name}",
+        author_icon: url,
+        fields: [
+          { title: 'Followers', value: count }
+        ],
+        color: COLORS[index]
+      }
+      attachment[:fields] << { title: 'Target', value: count } if targets && targets[index]
+
+      attachment
+    end
+
+    def profile(name)
+      #
+      # See more about #user
+      # http://www.rubydoc.info/gems/twitter/Twitter/REST/Users#user-instance_method
+      #
+      user = Twitter.client.user(name)
+      [user.profile_image_url, user.followers_count]
+    end
+  end
 end
 
-call
+FollowerNotifier.call
