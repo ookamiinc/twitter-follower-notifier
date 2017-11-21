@@ -35,7 +35,7 @@ class FollowerNotifier
         ],
         color: COLORS[index]
       }
-      attachment[:fields] << { title: 'Target', value: count, short: true } if targets && targets[index]
+      attachment[:fields] << { title: 'Target', value: targets[index], short: true } if targets && targets[index]
 
       attachment
     end
