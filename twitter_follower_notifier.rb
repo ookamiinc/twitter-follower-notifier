@@ -1,4 +1,5 @@
 require './twitter_client.rb'
+require 'slack/incoming/webhooks'
 
 # Notify followers_count of twitter users
 # Specified by the screen_names
